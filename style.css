@@ -1,27 +1,46 @@
 :root {
     --bg: #f7f3ef;
+    --bg-alt: #efe9e0;
     --card: #fff;
+    --card-alt: #fbfbfb;
     --accent: #06b6d4;
     /* teal */
     --muted: #666;
+    --text: #111;
     --border: #d1d5db;
+    --button-bg: #111;
+    --button-text: #fff;
     --cell-size: 72px;
     --gap: 8px;
     --rounded: 8px;
     --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
+/* Dark theme */
+:root.dark {
+    --bg: #0b1220;
+    --bg-alt: #071028;
+    --card: #0f1724;
+    --card-alt: #0b1220;
+    --accent: #06b6d4;
+    --muted: #94a3b8;
+    --text: #e6eef4;
+    --border: #1f2937;
+    --button-bg: #111827;
+    --button-text: #fff;
+}
+
 body {
     font-family: var(--font);
-    background: linear-gradient(180deg, #efe9e0, #f7f3ef);
+    background: linear-gradient(180deg, var(--bg-alt), var(--bg));
     padding: 20px;
-    color: #111;
+    color: var(--text);
 }
 
 .container {
     max-width: 1100px;
     margin: 0 auto;
-    background: linear-gradient(180deg, #fff, #fbfbfb);
+    background: linear-gradient(180deg, var(--card), var(--card-alt));
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 6px 24px rgba(20, 20, 20, 0.08);
@@ -30,6 +49,14 @@ body {
 h1 {
     margin: 0 0 12px;
     font-size: 20px
+}
+/* header row with title and toggle */
+.header-row {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
 }
 
 .grid {
@@ -71,8 +98,8 @@ button,
     border-radius: 8px;
     border: 0;
     cursor: pointer;
-    background: #111;
-    color: #fff;
+    background: var(--button-bg);
+    color: var(--button-text);
     font-weight: 600;
 }
 
@@ -166,6 +193,23 @@ button.green {
     display: inline-block;
     position: relative;
     overflow: hidden
+}
+
+/* theme toggle */
+.theme-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+@media (max-width:880px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+    .header-row { gap: 6px; }
 }
 
 .file-label input[type=file] {

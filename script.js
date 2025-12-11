@@ -2,6 +2,7 @@
 (function () {
     const DENOMS = [50, 100, 200, 500];
     const key = 'moneySaverBoard';
+    const THEME_KEY = 'moneySaverTheme';
 
     // Elements
     const goalEl = document.getElementById('goal');
@@ -18,6 +19,7 @@
     const exportBtn = document.getElementById('exportBtn');
     const importFile = document.getElementById('importFile');
     const downloadSvgBtn = document.getElementById('downloadSvg');
+    const themeToggle = document.getElementById('themeToggle');
 
     let state = {
         goal: Number(goalEl.value),
@@ -199,6 +201,31 @@
         URL.revokeObjectURL(url);
     }
 
+    // Theme helpers
+    function getStoredTheme() {
+        const t = localStorage.getItem(THEME_KEY);
+        if (t) return t;
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+        return 'light';
+    }
+
+    function applyTheme(theme) {
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+        if (themeToggle) {
+            themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+            themeToggle.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+        }
+        localStorage.setItem(THEME_KEY, theme);
+    }
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const current = getStoredTheme();
+            const next = current === 'dark' ? 'light' : 'dark';
+            applyTheme(next);
+        });
+    }
+
     // events
     generateBtn.addEventListener('click', () => {
         state.goal = Number(goalEl.value) || state.goal;
@@ -236,6 +263,8 @@
 
     // initial load
     loadState();
+    // apply theme from storage or preferences
+    applyTheme(getStoredTheme());
     // if no cells exist yet, generate a default board
     if (!Array.isArray(state.cells) || state.cells.length === 0) {
         // keep defaults from inputs if present
