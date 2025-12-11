@@ -46,22 +46,91 @@
     function randomChoice(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
     // Generate randomized board
-    function generateBoard() {
-        const n = Math.max(1, Math.floor(Number(state.days)));
-        const temp = [];
-        let sum = 0;
-        for (let i = 0; i < Math.max(0, n - 1); i++) {
-            const v = randomChoice(DENOMS);
-            temp.push({ index: i, value: v, saved: false });
-            sum += v;
-        }
-        let remaining = Math.max(0, Number(state.goal) - sum);
-        let lastVal = remaining > 0 ? remaining : randomChoice(DENOMS);
-        temp.push({ index: n - 1, value: lastVal, saved: false });
-        state.cells = temp;
-        saveState();
-        render();
+// Generate randomized board: every cell ∈ {50,100,200,500}, exactly `days` cells, sum == goal
+function generateBoard() {
+    const n = Math.max(1, Math.floor(Number(state.days)));
+    const G = Number(state.goal);
+
+    // validity checks
+    if (!Number.isFinite(G) || G <= 0) {
+        alert('Enter a valid positive goal.');
+        return;
     }
+    if (G % 50 !== 0) {
+        alert('Goal must be a multiple of 50 to use available denominations (50,100,200,500).');
+        return;
+    }
+
+    const totalUnits = G / 50;     // all measured as 50-rupee units
+    const minUnits = n * 1;        // each cell at least 1 unit (50)
+    const maxUnits = n * 10;       // each cell at most 10 units (500)
+
+    if (totalUnits < minUnits || totalUnits > maxUnits) {
+        alert(
+            `Goal of ₹${G.toLocaleString()} cannot be covered in ${n} days with each cell ≤ ₹500.\n` +
+            `You need a goal between ₹${(minUnits * 50).toLocaleString()} and ₹${(maxUnits * 50).toLocaleString()} for ${n} days.`
+        );
+        return;
+    }
+
+    // unit-choices corresponding to denominations [50,100,200,500]
+    const ks = [1, 2, 4, 10];
+
+    // DP table: dp[i][u] = k used to reach sum u with i cells, or -1 if unreachable
+    const target = totalUnits;
+    const dp = Array.from({ length: n + 1 }, () => Array(target + 1).fill(-1));
+    dp[0][0] = 0;
+
+    for (let i = 0; i < n; i++) {
+        for (let u = 0; u <= target; u++) {
+            if (dp[i][u] !== -1) {
+                for (const k of ks) {
+                    const nu = u + k;
+                    if (nu <= target && dp[i + 1][nu] === -1) {
+                        dp[i + 1][nu] = k;
+                    }
+                }
+            }
+        }
+    }
+
+    if (dp[n][target] === -1) {
+        alert('Unable to distribute the target into the given number of days using available denominations.');
+        return;
+    }
+
+    // Backtrack to retrieve k-values per cell
+    const resKs = [];
+    let curU = target;
+    for (let i = n; i > 0; i--) {
+        const k = dp[i][curU];
+        resKs.push(k);
+        curU -= k;
+    }
+    resKs.reverse(); // length === n, each k ∈ {1,2,4,10}
+
+    // Convert to cells (value = k * 50)
+    let temp = resKs.map((k, idx) => ({ index: idx, value: k * 50, saved: false }));
+
+    // Optional: shuffle so the denominations are not always in the same order
+    // (keeps distribution random-looking but still exact)
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+    shuffle(temp);
+
+    // reassign indexes after shuffle
+    temp.forEach((c, i) => (c.index = i));
+
+    // store + render
+    state.cells = temp;
+    saveState();
+    render();
+}
+
 
     // Toggle a cell saved
     function toggleCell(i) {
