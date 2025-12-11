@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Money Saver Board (HTML)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Money Saver Board</h1>
+    <div class="grid">
+      <div>
+        <label>Savings Goal</label>
+        <input id="goal" type="number" min="1" value="100000" />
+
+        <label style="margin-top:10px">Days (cells)</label>
+        <input id="days" type="number" min="1" value="200" />
+
+        <label style="margin-top:10px">Columns (board width)</label>
+        <input id="columns" type="range" min="4" max="20" value="10" />
+        <div class="small" id="colCount">10 columns</div>
+
+        <div class="small" style="margin-top:8px">Each cell will be randomly assigned one of: <strong>50, 100, 200, 500</strong>. The last cell is adjusted to meet the exact goal.</div>
+
+        <div class="controls">
+          <button id="generateBtn">Generate board</button>
+          <button id="resetBtn" class="danger">Reset</button>
+          <button id="exportBtn" class="secondary">Export JSON</button>
+          <label class="file-label">
+            Import JSON
+            <input id="importFile" type="file" accept="application/json" />
+          </label>
+          <button id="downloadSvg" class="green">Download SVG</button>
+        </div>
+      </div>
+
+      <div class="board-wrap">
+        <div class="summary">
+          <div>
+            <div class="small">Saved</div>
+            <div id="savedAmount" style="font-size:18px; font-weight:700">₹0</div>
+          </div>
+          <div style="text-align:right">
+            <div class="small">Goal</div>
+            <div id="goalLabel" style="font-size:18px; font-weight:700">₹100,000</div>
+          </div>
+        </div>
+
+        <div class="progress-bar" aria-hidden>
+          <div class="progress-inner" id="progressInner"></div>
+        </div>
+        <div class="small" id="percentLabel" style="margin-top:6px">0% reached</div>
+
+        <div id="board" class="board" style="margin-top:12px"></div>
+
+        <div class="footer-note">Tip: Click a cell to mark it saved. The board persists in your browser (localStorage).</div>
+      </div>
+    </div>
+  </div>
+
+<script src="script.js"></script>
+</body>
+</html>
